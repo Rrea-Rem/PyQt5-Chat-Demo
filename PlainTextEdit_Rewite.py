@@ -11,7 +11,7 @@ class MyPlainTextEdit(QPlainTextEdit):  #父类为QPlainTextEdit
     def keyPressEvent(self, event: QKeyEvent): #重写keyPressEvent方法
         if event.key() == Qt.Key_Return and event.modifiers() == Qt.ControlModifier:#ctrl+回车
             self.insertPlainText('\n')                                              #添加换行
-        elif event.key() == Qt.Key_Return:                                          #回车
+        elif self.toPlainText() and event.key() == Qt.Key_Return:                                          #回车
             self.demo_function() # 调用 demo 函数
         else:
             super().keyPressEvent(event)

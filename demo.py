@@ -12,21 +12,22 @@ class MainWindow(QMainWindow,Ui_MainWindow):
         self.setupUi(self)
         self.sum=0                                                  #气泡数量
         self.widgetlist = []                                        #记录气泡
+        self.text = ""                                              # 存储信息
+        self.icon = QtGui.QPixmap("1.jpg")                          # 头像
         #设置聊天窗口样式 隐藏滚动条
         self.scrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.scrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         # 信号与槽
-        self.pushButton.clicked.connect(self.create_widget)
-        self.pushButton.clicked.connect(self.set_widget)
-        self.plainTextEdit.undoAvailable.connect(self.Event)
-        self.icon = QtGui.QPixmap("1.jpg")                          #头像
-        self.text=""
+        self.pushButton.clicked.connect(self.create_widget)         #创建气泡
+        self.pushButton.clicked.connect(self.set_widget)            #修改气泡长宽
+        self.plainTextEdit.undoAvailable.connect(self.Event)        #监听输入框状态
+        scrollbar = self.scrollArea.verticalScrollBar()
+        scrollbar.rangeChanged.connect(self.adjustScrollToMaxValue) #监听窗口滚动条范围
+
 
     # 回车绑定发送
     def Event(self):
-        if self.plainTextEdit.isEnabled():
-            pass
-        else:
+        if not self.plainTextEdit.isEnabled():  #这里通过文本框的是否可输入
             self.plainTextEdit.setEnabled(True)
             self.pushButton.click()
             self.plainTextEdit.setFocus()
@@ -42,6 +43,7 @@ class MainWindow(QMainWindow,Ui_MainWindow):
         else:
             Set_question.set_return(self, self.icon, self.text,QtCore.Qt.RightToLeft)   # 调用new_widget.py中方法生成右气泡
             QApplication.processEvents()                                # 等待并处理主循环事件队列
+
 
         # 你可以通过这个下面代码中的数组单独控制每一条气泡
         # self.widgetlist.append(self.widget)
@@ -61,9 +63,13 @@ class MainWindow(QMainWindow,Ui_MainWindow):
                 text_width=int(self.textBrowser.document().size().width())+100  #固定宽度
             self.widget.setMinimumSize(text_width,int(self.textBrowser.document().size().height())+ 40) #规定气泡大小
             self.widget.setMaximumSize(text_width,int(self.textBrowser.document().size().height())+ 40) #规定气泡大小
-        if self.scrollArea.verticalScrollBar().maximum():
-            self.scrollArea.verticalScrollBar().setValue(self.scrollArea.verticalScrollBar().maximum())
-            # 滚动到底部
+            self.scrollArea.verticalScrollBar().setValue(10)
+
+
+    # 窗口滚动到最底部
+    def adjustScrollToMaxValue(self):
+        scrollbar = self.scrollArea.verticalScrollBar()
+        scrollbar.setValue(scrollbar.maximum())
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
